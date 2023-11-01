@@ -156,19 +156,57 @@ export default function App() {
                              latitudeDelta: 0.00922,
                              longitudeDelta: 0.00421,
                          }}/>
-            </View>
-        )
-    }
+                <TouchableOpacity
+                    style={styles.menuButton}
+                    onPress={() => {
 
+                    }}
+                >
+                    <Ionicons name="ios-menu" size={44} color="#EBECF1"/>
+                </TouchableOpacity>
+
+                <View style={styles.textBox}>
+                    <Text style={styles.textBoxText}>Location:</Text>
+                    <Text style={styles.textBoxText}>Latitude: {location.coords.latitude.toFixed(5)}</Text>
+                    <Text style={styles.textBoxText}>Longitude {location.coords.longitude.toFixed(5)}</Text>
+                </View>
+
+
+                <View style={styles.camera}>
+                    {/*<Camera style={styles.camera} type={type}>*/}
+                    <Animated.View style={[styles.textArea, animatedStyle]}>
+                        <View style={styles.container2}>
+                            <TouchableOpacity
+                                style={styles.detailsToggle}
+                                onPress={toggleDetails}
+                            >
+                                <View style={styles.box}></View>
+                            </TouchableOpacity>
+                            <View style={styles.constantSizeContainer}>
+                                <ScrollView style={styles.container2}>
+                                    {/*<View>*/}
+                                    {pois.concat(cutomPois).map((poi) => (
+                                        <TouchableOpacity>
+                                            <View style={styles.card} key={poi.name}>
+                                                <Text style={styles.cardTitle}>{poi.name}</Text>
+                                                <Text style={styles.cardText}>{poi.address}</Text>
+                                                <Text style={styles.cardText}>Latitude: {poi.lat}</Text>
+                                                <Text style={styles.cardText}>Longitude: {poi.lon}</Text>
+                                            </View>
+                                        </TouchableOpacity>
+                                    ))}
+                                    {/*</View>*/}
+                                </ScrollView>
+                            </View>
+                        </View>
+                    </Animated.View>
+                    {/*</Camera>*/}
+                </View>
+            </View>
+        );
+    }
     return (
         <View style={styles.container}>
-            <MapView style={styles.map}
-                     region={{
-                         latitude: location.coords.latitude,
-                         longitude: location.coords.longitude,
-                         latitudeDelta: 0.00922,
-                         longitudeDelta: 0.00421,
-                     }}/>
             <TouchableOpacity
                 style={styles.menuButton}
                 onPress={() => {
@@ -185,8 +223,7 @@ export default function App() {
             </View>
 
 
-            <View style={styles.camera}>
-            {/*<Camera style={styles.camera} type={type}>*/}
+            <Camera style={styles.camera} type={type}>
             <Animated.View style={[styles.textArea, animatedStyle]}>
                 <View style={styles.container2}>
                     <TouchableOpacity
@@ -213,8 +250,7 @@ export default function App() {
                     </View>
                 </View>
             </Animated.View>
-            {/*</Camera>*/}
-                </View>
+            </Camera>
         </View>
     );
 }

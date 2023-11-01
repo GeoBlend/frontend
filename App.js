@@ -4,6 +4,8 @@ import {Animated, Button, ScrollView, StyleSheet, Text, TouchableOpacity, View} 
 import React, {useEffect, useRef, useState} from "react";
 import * as Location from "expo-location";
 
+import MapView from 'react-native-maps';
+
 export default function App() {
     const [type, setType] = useState(CameraType.back);
     const [permission, requestPermission] = Camera.useCameraPermissions();
@@ -23,6 +25,8 @@ export default function App() {
     const [pois, setPois] = useState([]);
     const [cutomPois, setCustomPois] = useState([]);
     const [errorMsg, setErrorMsg] = useState(null);
+
+    const [showmap, setMap] = useState(false);
 
     const [isDetailsVisible, setIsDetailsVisible] = useState(false);
     const animatedValue = useRef(new Animated.Value(0)).current;
@@ -54,14 +58,14 @@ export default function App() {
                         "lon": -81.45145655,
                         "address": "676 Natureland Cir, St. Augustine, FL 32092, USA",
                         "custom": false
-                    },{
-                    "name": "St. Johns County, Florida",
-                    "wikipedia_url": "http://en.wikipedia.org/wiki/St._Johns_County,_Florida",
-                    "lat": 29.93781345,
-                    "lon": -81.45145655,
-                    "address": "676 Natureland Cir, St. Augustine, FL 32092, USA",
-                    "custom": false
-                }
+                    }, {
+                        "name": "St. Johns County, Florida",
+                        "wikipedia_url": "http://en.wikipedia.org/wiki/St._Johns_County,_Florida",
+                        "lat": 29.93781345,
+                        "lon": -81.45145655,
+                        "address": "676 Natureland Cir, St. Augustine, FL 32092, USA",
+                        "custom": false
+                    }
                 ]
             );
             fetch(
@@ -125,6 +129,7 @@ export default function App() {
         );
     }
 
+
     const toggleDetails = () => {
         setIsDetailsVisible(!isDetailsVisible);
         Animated.timing(animatedValue, {
@@ -141,14 +146,33 @@ export default function App() {
         }),
     };
 
-
+    if (showmap) {
+        return (
+            <View style={styles.container}>
+                <MapView style={styles.map}
+                         region={{
+                             latitude: location.coords.latitude,
+                             longitude: location.coords.longitude,
+                             latitudeDelta: 0.00922,
+                             longitudeDelta: 0.00421,
+                         }}/>
+            </View>
+        )
+    }
 
     return (
         <View style={styles.container}>
+            <MapView style={styles.map}
+                     region={{
+                         latitude: location.coords.latitude,
+                         longitude: location.coords.longitude,
+                         latitudeDelta: 0.00922,
+                         longitudeDelta: 0.00421,
+                     }}/>
             <TouchableOpacity
                 style={styles.menuButton}
                 onPress={() => {
-                    // Add your code to open the side panel here
+
                 }}
             >
                 <Ionicons name="ios-menu" size={44} color="#EBECF1"/>
@@ -156,39 +180,41 @@ export default function App() {
 
             <View style={styles.textBox}>
                 <Text style={styles.textBoxText}>Location:</Text>
-                <Text style={styles.textBoxText}>{location.coords.latitude}</Text>
-                <Text style={styles.textBoxText}>{location.coords.longitude}</Text>
+                <Text style={styles.textBoxText}>Latitude: {location.coords.latitude.toFixed(5)}</Text>
+                <Text style={styles.textBoxText}>Longitude {location.coords.longitude.toFixed(5)}</Text>
             </View>
 
 
-            <Camera style={styles.camera} type={type}>
-                <Animated.View style={[styles.textArea, animatedStyle]}>
-                    <View style={styles.container2}>
-                        <TouchableOpacity
-                            style={styles.detailsToggle}
-                            onPress={toggleDetails}
-                        >
-                            <View style={styles.box}></View>
-                        </TouchableOpacity>
-                        <View style={styles.constantSizeContainer}>
+            <View style={styles.camera}>
+            {/*<Camera style={styles.camera} type={type}>*/}
+            <Animated.View style={[styles.textArea, animatedStyle]}>
+                <View style={styles.container2}>
+                    <TouchableOpacity
+                        style={styles.detailsToggle}
+                        onPress={toggleDetails}
+                    >
+                        <View style={styles.box}></View>
+                    </TouchableOpacity>
+                    <View style={styles.constantSizeContainer}>
                         <ScrollView style={styles.container2}>
                             {/*<View>*/}
-                                {pois.concat(cutomPois).map((poi) => (
-                                    <TouchableOpacity>
+                            {pois.concat(cutomPois).map((poi) => (
+                                <TouchableOpacity>
                                     <View style={styles.card} key={poi.name}>
                                         <Text style={styles.cardTitle}>{poi.name}</Text>
                                         <Text style={styles.cardText}>{poi.address}</Text>
                                         <Text style={styles.cardText}>Latitude: {poi.lat}</Text>
                                         <Text style={styles.cardText}>Longitude: {poi.lon}</Text>
                                     </View>
-                                        </TouchableOpacity>
-                                ))}
+                                </TouchableOpacity>
+                            ))}
                             {/*</View>*/}
                         </ScrollView>
-                        </View>
                     </View>
-                </Animated.View>
-            </Camera>
+                </View>
+            </Animated.View>
+            {/*</Camera>*/}
+                </View>
         </View>
     );
 }
@@ -197,12 +223,10 @@ const styles = StyleSheet.create({
     card: {
         borderRadius: 36,
         margin: 5,
-        padding:40,
+        padding: 40,
         paddingBottom: 10,
-        paddingTop:10,
+        paddingTop: 10,
         backgroundColor: "#02030a",
-
-
     },
     cardTitle: {
         fontSize: 24,
@@ -230,14 +254,20 @@ const styles = StyleSheet.create({
     container2: {
         //flexDirection: 'column',
         flex: 1,
-        zIndex:0,
+        //zIndex:1,
 
         overflow: 'hidden',
+    },
+
+    map: {
+        width: '100%',
+        height: '100%',
+        zIndex: 0,
     },
     constantSizeContainer: {
         position: 'absolute',
         marginTop: 40,
-        marginRight:0,
+        marginRight: 0,
         height: 1000, // Set your desired height
         justifyContent: 'center',
         alignItems: 'center',
@@ -255,6 +285,7 @@ const styles = StyleSheet.create({
         marginRight: 15,
         marginBottom: -30,
         borderRadius: 36,
+        zIndex: 2,
     },
     detailsToggle: {
         flex: 1,
@@ -291,17 +322,18 @@ const styles = StyleSheet.create({
         backgroundColor: "#1B1C25",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 1,
-        padding: 5,
+        //zIndex: 1,
+        padding: 8,
     },
     locationIcon: {
         marginHorizontal: 10,  // Add some margin to move it away from the edges
     },
     textBoxText: {
         flex: 1,  // <-- Add this line to make text take available space
-        alignSelf: "flex-end",
+        alignSelf: "flex-start",
         textAlign: 'right',  // <-- Add this line to align text to the
         marginRight: 15,
+        marginLeft: 30,
         fontSize: 16,
         fontWeight: "bold",
         color: "#EBECF1",

@@ -58,14 +58,14 @@ export default function App() {
                         "lon": -81.45145655,
                         "address": "676 Natureland Cir, St. Augustine, FL 32092, USA",
                         "custom": false
-                    }, {
-                        "name": "St. Johns County, Florida",
-                        "wikipedia_url": "http://en.wikipedia.org/wiki/St._Johns_County,_Florida",
-                        "lat": 29.93781345,
-                        "lon": -81.45145655,
-                        "address": "676 Natureland Cir, St. Augustine, FL 32092, USA",
-                        "custom": false
-                    }
+                    },{
+                    "name": "St. Johns County, Florida",
+                    "wikipedia_url": "http://en.wikipedia.org/wiki/St._Johns_County,_Florida",
+                    "lat": 29.93781345,
+                    "lon": -81.45145655,
+                    "address": "676 Natureland Cir, St. Augustine, FL 32092, USA",
+                    "custom": false
+                }
                 ]
             );
             fetch(
@@ -146,65 +146,8 @@ export default function App() {
         }),
     };
 
-    if (showmap) {
-        return (
-            <View style={styles.container}>
-                <MapView style={styles.map}
-                         region={{
-                             latitude: location.coords.latitude,
-                             longitude: location.coords.longitude,
-                             latitudeDelta: 0.00922,
-                             longitudeDelta: 0.00421,
-                         }}/>
-                <TouchableOpacity
-                    style={styles.menuButton}
-                    onPress={() => {
-
-                    }}
-                >
-                    <Ionicons name="ios-menu" size={44} color="#EBECF1"/>
-                </TouchableOpacity>
-
-                <View style={styles.textBox}>
-                    <Text style={styles.textBoxText}>Location:</Text>
-                    <Text style={styles.textBoxText}>Latitude: {location.coords.latitude.toFixed(5)}</Text>
-                    <Text style={styles.textBoxText}>Longitude {location.coords.longitude.toFixed(5)}</Text>
-                </View>
 
 
-                <View style={styles.camera}>
-                    {/*<Camera style={styles.camera} type={type}>*/}
-                    <Animated.View style={[styles.textArea, animatedStyle]}>
-                        <View style={styles.container2}>
-                            <TouchableOpacity
-                                style={styles.detailsToggle}
-                                onPress={toggleDetails}
-                            >
-                                <View style={styles.box}></View>
-                            </TouchableOpacity>
-                            <View style={styles.constantSizeContainer}>
-                                <ScrollView style={styles.container2}>
-                                    {/*<View>*/}
-                                    {pois.concat(cutomPois).map((poi) => (
-                                        <TouchableOpacity>
-                                            <View style={styles.card} key={poi.name}>
-                                                <Text style={styles.cardTitle}>{poi.name}</Text>
-                                                <Text style={styles.cardText}>{poi.address}</Text>
-                                                <Text style={styles.cardText}>Latitude: {poi.lat}</Text>
-                                                <Text style={styles.cardText}>Longitude: {poi.lon}</Text>
-                                            </View>
-                                        </TouchableOpacity>
-                                    ))}
-                                    {/*</View>*/}
-                                </ScrollView>
-                            </View>
-                        </View>
-                    </Animated.View>
-                    {/*</Camera>*/}
-                </View>
-            </View>
-        );
-    }
     return (
         <View style={styles.container}>
             <TouchableOpacity
@@ -224,32 +167,32 @@ export default function App() {
 
 
             <Camera style={styles.camera} type={type}>
-            <Animated.View style={[styles.textArea, animatedStyle]}>
-                <View style={styles.container2}>
-                    <TouchableOpacity
-                        style={styles.detailsToggle}
-                        onPress={toggleDetails}
-                    >
-                        <View style={styles.box}></View>
-                    </TouchableOpacity>
-                    <View style={styles.constantSizeContainer}>
+                <Animated.View style={[styles.textArea, animatedStyle]}>
+                    <View style={styles.container2}>
+                        <TouchableOpacity
+                            style={styles.detailsToggle}
+                            onPress={toggleDetails}
+                        >
+                            <View style={styles.box}></View>
+                        </TouchableOpacity>
+                        <View style={styles.constantSizeContainer}>
                         <ScrollView style={styles.container2}>
                             {/*<View>*/}
-                            {pois.concat(cutomPois).map((poi) => (
-                                <TouchableOpacity>
+                                {pois.concat(cutomPois).map((poi) => (
+                                    <TouchableOpacity>
                                     <View style={styles.card} key={poi.name}>
                                         <Text style={styles.cardTitle}>{poi.name}</Text>
                                         <Text style={styles.cardText}>{poi.address}</Text>
                                         <Text style={styles.cardText}>Latitude: {poi.lat}</Text>
                                         <Text style={styles.cardText}>Longitude: {poi.lon}</Text>
                                     </View>
-                                </TouchableOpacity>
-                            ))}
+                                        </TouchableOpacity>
+                                ))}
                             {/*</View>*/}
                         </ScrollView>
+                        </View>
                     </View>
-                </View>
-            </Animated.View>
+                </Animated.View>
             </Camera>
         </View>
     );
@@ -259,10 +202,12 @@ const styles = StyleSheet.create({
     card: {
         borderRadius: 36,
         margin: 5,
-        padding: 40,
+        padding:40,
         paddingBottom: 10,
-        paddingTop: 10,
+        paddingTop:10,
         backgroundColor: "#02030a",
+
+
     },
     cardTitle: {
         fontSize: 24,
@@ -290,7 +235,7 @@ const styles = StyleSheet.create({
     container2: {
         //flexDirection: 'column',
         flex: 1,
-        //zIndex:1,
+        zIndex:0,
 
         overflow: 'hidden',
     },
@@ -298,12 +243,11 @@ const styles = StyleSheet.create({
     map: {
         width: '100%',
         height: '100%',
-        zIndex: 0,
     },
     constantSizeContainer: {
         position: 'absolute',
         marginTop: 40,
-        marginRight: 0,
+        marginRight:0,
         height: 1000, // Set your desired height
         justifyContent: 'center',
         alignItems: 'center',
@@ -321,7 +265,6 @@ const styles = StyleSheet.create({
         marginRight: 15,
         marginBottom: -30,
         borderRadius: 36,
-        zIndex: 2,
     },
     detailsToggle: {
         flex: 1,
@@ -358,7 +301,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#1B1C25",
         alignItems: "center",
         justifyContent: "center",
-        //zIndex: 1,
+        zIndex: 1,
         padding: 8,
     },
     locationIcon: {

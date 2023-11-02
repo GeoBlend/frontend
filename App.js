@@ -14,7 +14,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import * as Location from "expo-location";
 
-import MapView from "react-native-maps";
+import MapView, {Marker} from "react-native-maps";
 
 export default function App() {
   const [type, setType] = useState(CameraType.back);
@@ -192,22 +192,48 @@ export default function App() {
     );
   }
 
+  // Sample array of marker locations
+  const markers = [{'id': '1', 'latitude': 30.27161107496437, 'longitude': -81.47737737260258},
+  {'id': '2', 'latitude': 30.275653313143035, 'longitude': -81.48006997151921},
+  {'id': '3', 'latitude': 30.27691523323448, 'longitude': -81.47261414338494},
+  {'id': '4', 'latitude': 30.27637079127407, 'longitude': -81.4722217906488},
+  {'id': '5', 'latitude': 30.27933870964682, 'longitude': -81.47887433870882},
+  {'id': '6', 'latitude': 30.27878315462699, 'longitude': -81.47133753659227},
+  {'id': '7', 'latitude': 30.273282778861137, 'longitude': -81.47764176801218},
+  {'id': '8', 'latitude': 30.271047582110548, 'longitude': -81.47310866296117},
+  {'id': '9', 'latitude': 30.278234391094323, 'longitude': -81.47392373486427},
+  {'id': '10', 'latitude': 30.27667002341048, 'longitude': -81.47216433320646}]
+ 
+
   if (showmap) {
     return (
       <View style={styles.container}>
         <MapView
-          style={styles.map}
-          region={{
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-            latitudeDelta: 0.00922,
-            longitudeDelta: 0.00421,
-          }}
-          showsUserLocation={true}
-          showsMyLocationButton={false}
-          showsCompass={false}
-          mapType={"satellite"}
-        />
+            style={styles.map}
+            region={{
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+              latitudeDelta: 0.00922,
+              longitudeDelta: 0.00421,
+            }}
+            showsUserLocation={true}
+            showsMyLocationButton={false}
+            showsCompass={false}
+            mapType={"standard"}
+        >
+          {/* Adding Markers */}
+          {markers.map((marker) => (
+              <Marker
+                  key={marker.id}
+                  coordinate={{
+                    latitude: marker.latitude,
+                    longitude: marker.longitude,
+                  }}
+                  title={"POI"}
+                  description={"Historic Monument"}
+              />
+          ))}
+        </MapView>
         <TouchableOpacity
           style={styles.menuButton}
           onPress={() => {
@@ -313,7 +339,6 @@ export default function App() {
                       />
                       <Text style={styles.cardTitle}>{poi.name}</Text>
                       <Text style={styles.cardText}>{poi.address}</Text>
-
                       <Text style={styles.cardText}>{poi.details}</Text>
                       <Text style={styles.cardText}>Latitude: {poi.lat}</Text>
                       <Text style={styles.cardText}>Longitude: {poi.lon}</Text>

@@ -1,21 +1,23 @@
-import { Ionicons } from "@expo/vector-icons";
-import { Camera, CameraType } from "expo-camera";
+import {Ionicons} from "@expo/vector-icons";
+import {Camera, CameraType} from "expo-camera";
 import {
   Animated,
   Button,
+  Dimensions,
   Image,
+  Keyboard,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
-  View,
   TextInput,
-  Dimensions,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import * as Location from "expo-location";
 
-import MapView from "react-native-maps";
+import MapView, {Marker} from "react-native-maps";
 
 export default function App() {
   const vh = Dimensions.get("window").height/100;
@@ -25,13 +27,14 @@ export default function App() {
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const [location, setLocation] = useState(null);
   const [pois, setPois] = useState([]);
-  const [cutomPois, setCustomPois] = useState([]);
+  const [customPois, setCustomPois] = useState([]);
   const [errorMsg, setErrorMsg] = useState(null);
 
   const [showmap, setMap] = useState(false);
   const [prefEntered, setPref] = useState(false);
 
   const [isDetailsVisible, setIsDetailsVisible] = useState(false);
+  const [selectedPoi, setSelectedPoi] = useState(null);
   const animatedValue = useRef(new Animated.Value(0)).current;
 
   const [text, onChangeText] = React.useState("");
@@ -52,70 +55,29 @@ export default function App() {
 
   useEffect(() => {
     if (location) {
-      //console.log(`http://localhost:3000/api/get_pois?lat=${location.coords.latitude}&lon=${location.coords.longitude}`)
-      //TODO: Remove this
-      // setPois([
-      //   {
-      //     name: "St. Johns County, Florida",
-      //     wikipedia_url:
-      //       "http://en.wikipedia.org/wiki/St._Johns_County,_Florida",
-      //     lat: 29.93781345,
-      //     lon: -81.45145655,
-      //     address: "676 Natureland Cir, St. Augustine, FL 32092, USA",
-      //     custom: false,
-      //     details: "St. Johns County is a county in the northeastern part of the U.S. state of Florida. As of the 2020 United States Census, its population was 273,425.[1] The county seat and largest incorporated city is St. Augustine, although the largest community, St. Johns, is much larger.[2] St. Johns County is part of the Jacksonville metropolitan area. The county was established in 1821. It was named for the St. Johns River, which runs along its western border. The St. Johns River is the longest river in Florida and is the state's most significant commercial, agricultural, residential, and recreational waterway. St. Johns County is one of the two original counties of Florida, established July 21, 1821, when Florida became a state, and was divided into 39 counties in 1824. St. Johns County was created out of Duval County, which covered most of the northern part of the state.",
-      //     imageUrl:
-      //       "https://lh5.googleusercontent.com/p/AF1QipNtVj045Rr-MPs2YeH8APuK3_sjzs_3VAYN9iXd=w408-h413-k-no",
-      //   },
-      //   {
-      //       name: "Kingsley Plantation",
-      //       wikipedia_url:
-      //         "https://en.wikipedia.org/wiki/Kingsley_Plantation",
-      //       lat: 30.438333,
-      //       lon: -81.438056,
-      //       address: "676 Natureland Circle, St. Augustine, FL 32092, USA",
-      //       custom: false,
-      //       details: "Kingsley Plantation (also known as the Zephaniah Kingsley Plantation Home and Buildings) is the site of a former estate on Fort George Island, in Duval County, Florida, that was named for its developer and most famous owner, Zephaniah Kingsley, who spent 25 years there. It is located at the northern tip of Fort George Island at Fort George Inlet, and is part of the Timucuan Ecological and Historic Preserve managed by the U.S. National Park Service. Kingsley's house is the oldest plantation house still standing in Florida, and the solidly-built village of slave cabins is one of the best preserved in the United States. It is also ",
-      //       imageUrl:
-      //         "https://lh5.googleusercontent.com/p/AF1QipNtVj045Rr-MPs2YeH8APuK3_sjzs_3VAYN9iXd=w408-h413-k-no",
-      //     },
-      // ]);
-      // fetch(
-      //   `http://localhost:3000/api/get_pois?lat=${location.coords.latitude}&lon=${location.coords.longitude}`,
-      //   { method: "GET" }
-      // )
-      //   .then((response) => response.json())
-      //   .then((data) => {
-      //     setPois(data);
-      //     // console.log(
-      //     //   2,
-      //     //   location.coords.latitude,
-      //     //   location.coords.longitude,
-      //     //   data[0]
-      //     // );
-      //   })
-      //   .catch((err) => {
-      //     console.log(err.message);
-      //   });
       fetch(
-        `http://localhost:3000/api/get_custom_pois?lat=${location.coords.latitude}&lon=${location.coords.longitude}`,
-        { method: "GET" }
+          `https://geoblendapi.deltaprojects.dev/api/get_pois?lat=${location.coords.latitude}&lon=${location.coords.longitude}`,
+          {method: "GET"}
       )
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          setCustomPois(data);
-          // console.log(
-            
-          //   1,
-          //   location.coords.latitude,
-          //   location.coords.longitude,
-          //   data[0]
-          // );
-        })
-        .catch((err) => {
-          console.log(err.message);
-        });
+          .then((response) => response.json())
+          .then((poiData) => {
+            setPois(poiData);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+
+      fetch(
+          `https://geoblendapi.deltaprojects.dev/api/get_custom_pois?lat=${location.coords.latitude}&lon=${location.coords.longitude}`,
+          {method: "GET"}
+      )
+          .then((response) => response.json())
+          .then((customPoiData) => {
+            setCustomPois(customPoiData);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
     }
   }, [location]);
 
@@ -166,6 +128,7 @@ export default function App() {
   };
   if (!prefEntered) {
     return (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.containerCentered} >
         <Text style={{textAlign:"center", fontSize:20}}>
           Enter what you are most interesting in seeing and learning about:
@@ -185,15 +148,34 @@ export default function App() {
           title="Submit My Preferences"
         />
       </View>
+        </TouchableWithoutFeedback>
     );
   }
-  var allPois = pois.concat(cutomPois)
-  console.log(allPois);
+
+  function haversineDistanceInMiles(coords1, coords2) {
+    const toRadians = angle => angle * Math.PI / 180;
+
+    const earthRadiusMiles = 3958.8; // Earth's radius in miles
+    const lat1 = toRadians(coords1.lat);
+    const lat2 = toRadians(coords2.lat);
+    const deltaLat = toRadians(coords2.lat - coords1.lat);
+    const deltaLon = toRadians(coords2.lon - coords1.lon);
+
+    const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+        Math.cos(lat1) * Math.cos(lat2) *
+        Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return earthRadiusMiles * c; // Distance in miles
+  }
+
+  const allPois = pois.concat(customPois);
   allPois.forEach((poi) => {
-    poi.dist = Math.sqrt(Math.pow(Math.abs(location.coords.latitude - poi.lat), 2) + Math.pow(Math.abs(location.coords.longitude - poi.lon), 2));
-    // console.log(poi.dist);
+    poi.dist = haversineDistanceInMiles({lat: location.coords.latitude, lon: location.coords.longitude}, poi)
   });
   allPois.sort((a, b) => a.dist - b.dist);
+
+  console.log({allPois});
 
   if (showmap) {
     return (
@@ -207,10 +189,20 @@ export default function App() {
             longitudeDelta: 0.00421,
           }}
           showsUserLocation={true}
-          showsMyLocationButton={false}
-          showsCompass={false}
+          showsMyLocationButton={true}
+          showsCompass={true}
           mapType={"satellite"}
-        />
+        >
+          {allPois.map((poi, idx) => (
+                  <Marker
+                      coordinate={{latitude: poi.lat, longitude: poi.lon}}
+                      title={poi.name}
+                      description={`${Math.round(poi.dist * 100) / 100} mile(s) away`}
+                      key={idx}
+                  />
+              )
+          )}
+        </MapView>
         <TouchableOpacity
           style={styles.menuButton}
           onPress={() => {
@@ -228,49 +220,6 @@ export default function App() {
           <Text style={styles.textBoxText}>
             Longitude {location.coords.longitude.toFixed(5)}
           </Text>
-        </View>
-
-        <View style={styles.details}>
-          <Animated.View style={[styles.textArea, animatedStyle]}>
-            <View style={styles.container2}>
-              <TouchableOpacity
-                style={styles.detailsToggle}
-                onPress={toggleDetails}
-              >
-                <View style={styles.box}></View>
-              </TouchableOpacity>
-              <View style={styles.constantSizeContainer}>
-                <ScrollView style={styles.container2}>
-                  {/* <View style={{height:"100%"}}> */}
-                  {allPois.map((poi) => (
-                    <TouchableOpacity>
-                      <View style={styles.card} key={poi.name}>
-                        <Image
-                          style={{
-                            width: "140%",
-                            height: 300,
-                            alignSelf: "center",
-                            marginBottom: 10,
-                          }}
-                          source={{
-                            uri: poi.imageUrl, // Assuming 'imageUrl' is a property in your POI objects
-                          }}
-                        />
-                        <Text style={styles.cardTitle}>{poi.name}</Text>
-                        <Text style={styles.cardText}>{poi.address}</Text>
-
-                        <Text style={styles.cardText}>{poi.details}</Text>
-                        <Text style={styles.cardText}>Latitude: {poi.lat}</Text>
-                        <Text style={styles.cardText}>Longitude: {poi.lon}</Text>
-                        <Text style={styles.cardText}>Dist: {poi.dist}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                  {/* </View> */}
-                </ScrollView>
-              </View>
-            </View>
-          </Animated.View>
         </View>
       </View>
     );
@@ -307,34 +256,32 @@ export default function App() {
                 <View style={styles.box}></View>
               </TouchableOpacity>
               <View style={styles.constantSizeContainer}>
-                <ScrollView style={styles.container2}>
-                  {/* <View style={{height:"100%"}}> */}
-                  {allPois.map((poi) => (
-                    <TouchableOpacity>
-                      <View style={styles.card} key={poi.name}>
-                        <Image
-                          style={{
-                            width: "140%",
-                            height: 300,
-                            alignSelf: "center",
-                            marginBottom: 10,
-                          }}
-                          source={{
-                            uri: poi.imageUrl, // Assuming 'imageUrl' is a property in your POI objects
-                          }}
-                        />
-                        <Text style={styles.cardTitle}>{poi.name}</Text>
-                        <Text style={styles.cardText}>{poi.address}</Text>
-
-                        <Text style={styles.cardText}>{poi.details}</Text>
-                        <Text style={styles.cardText}>Latitude: {poi.lat}</Text>
-                        <Text style={styles.cardText}>Longitude: {poi.lon}</Text>
-                        <Text style={styles.cardText}>Dist: {poi.dist}</Text>
+                {
+                  selectedPoi
+                      ? <View>
+                        <TouchableOpacity onPress={() => setSelectedPoi(null)} style={styles.closeButton}>
+                          <Text style={styles.closeButtonText}>X</Text>
+                        </TouchableOpacity>
+                        <Image source={{uri: "https://via.placeholder.com/150"}}/>
+                        <Text style={styles.cardTitle}>{selectedPoi.name}</Text>
+                        <Text style={styles.cardText}>lorem ipsum dolor sit amet</Text>
                       </View>
-                    </TouchableOpacity>
-                  ))}
-                  {/* </View> */}
-                </ScrollView>
+                      : <ScrollView style={styles.container2}>
+                        {
+                          allPois.map((poi, idx) => (
+                              <TouchableOpacity key={idx} onPress={() => setSelectedPoi(poi)}>
+                                <View style={styles.card}>
+                                  <Text style={styles.cardTitle}>{poi.name}</Text>
+                                  <Text style={styles.cardText}>{poi.address}</Text>
+                                  <Text style={styles.cardText}>Latitude: {poi.lat}</Text>
+                                  <Text style={styles.cardText}>Longitude: {poi.lon}</Text>
+                                  <Text style={styles.cardText}>{Math.round(poi.dist * 100) / 100} mile(s) away</Text>
+                                </View>
+                              </TouchableOpacity>
+                          ))
+                        }
+                      </ScrollView>
+                }
               </View>
             </View>
           </Animated.View>
@@ -350,7 +297,7 @@ const styles = StyleSheet.create({
     margin: 5,
     padding: 40,
     paddingBottom: 10,
-    paddingTop: 0,
+    paddingTop: 10,
     backgroundColor: "#02030a",
     overflow: "hidden",
   },
@@ -513,5 +460,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#EBECF1",
+  },
+
+  closeButton: {
+    top: 10,
+    right: 10,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.2,
+    shadowRadius: 1.5,
+    elevation: 3
+  },
+
+  closeButtonText: {
+    color: 'black',
+    fontSize: 24,
+    fontWeight: 'bold',
   },
 });

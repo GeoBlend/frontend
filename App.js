@@ -25,7 +25,7 @@ export default function App() {
   // console.log(vh, vw);
   const [type, setType] = useState(CameraType.back);
   const [permission, requestPermission] = Camera.useCameraPermissions();
-  const [location, setLocation] = useState(null);
+  const [location, setLocation] = useState(JSON.parse('{"coords":{"accuracy":5,"altitude":0,"altitudeAccuracy":-1,"heading":-1,"latitude":40.7128,"longitude":-74.0060,"speed":-1},"timestamp":1619620000000}'));
   const [pois, setPois] = useState([]);
   const [customPois, setCustomPois] = useState([]);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -35,12 +35,15 @@ export default function App() {
 
   const [isDetailsVisible, setIsDetailsVisible] = useState(false);
   const [selectedPoi, setSelectedPoi] = useState(null);
+  const [description, setDescription] = useState("");
   const animatedValue = useRef(new Animated.Value(0)).current;
 
   const [text, onChangeText] = React.useState("");
+  const [uri, setURI] = React.useState("https://geoblendapi.deltaprojects.dev/api");
 
   useEffect(() => {
     (async () => {
+           
       console.log("Getting location");
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -48,15 +51,18 @@ export default function App() {
         return;
       }
       let loc = await Location.getCurrentPositionAsync({accuracy: Location.Accuracy.Highest, maximumAge: 100000});
-      setLocation(loc);
+      if (loc.coords.latitude) {
+        setLocation(loc);
+      }
       console.log(location);
     })();
   }, []);
 
   useEffect(() => {
     if (location) {
+      console.log(`${uri}/get_pois?lat=${location.coords.latitude}&lon=${location.coords.longitude}`);
       fetch(
-          `https://geoblendapi.deltaprojects.dev/api/get_pois?lat=${location.coords.latitude}&lon=${location.coords.longitude}`,
+          `${uri}/get_pois?lat=${location.coords.latitude}&lon=${location.coords.longitude}`,
           {method: "GET"}
       )
           .then((response) => response.json())
@@ -68,7 +74,7 @@ export default function App() {
           });
 
       fetch(
-          `https://geoblendapi.deltaprojects.dev/api/get_custom_pois?lat=${location.coords.latitude}&lon=${location.coords.longitude}`,
+          `${uri}/get_custom_pois?lat=${location.coords.latitude}&lon=${location.coords.longitude}`,
           {method: "GET"}
       )
           .then((response) => response.json())
@@ -234,7 +240,8 @@ export default function App() {
           }}
         >
           <Ionicons name="ios-menu" size={44} color="#EBECF1" />
-        </TouchableOpacity>
+        </TouchableOpacity> 
+        {/* put in that sliding stuff ehre */}
 
         <View style={styles.textBox}>
           <Text style={styles.textBoxText}>Location:</Text>
@@ -258,18 +265,39 @@ export default function App() {
               <View style={styles.constantSizeContainer}>
                 {
                   selectedPoi
-                      ? <View>
+                      ? 
+                      <View >
+                        
                         <TouchableOpacity onPress={() => setSelectedPoi(null)} style={styles.closeButton}>
                           <Text style={styles.closeButtonText}>X</Text>
                         </TouchableOpacity>
                         <Image source={{uri: "https://via.placeholder.com/150"}}/>
                         <Text style={styles.cardTitle}>{selectedPoi.name}</Text>
-                        <Text style={styles.cardText}>lorem ipsum dolor sit amet</Text>
+                        <Text style={styles.cardText}>{description}</Text>
                       </View>
                       : <ScrollView style={styles.container2}>
                         {
                           allPois.map((poi, idx) => (
-                              <TouchableOpacity key={idx} onPress={() => setSelectedPoi(poi)}>
+                              <TouchableOpacity key={idx} onPress={() => {
+                                setSelectedPoi(poi)
+                                setDescription("Loading...");
+                                fetch(
+                                  `${uri}/openai_rephrase?info=${JSON.stringify(poi)}`,
+                                  {method: "GET"}
+                              )
+                                  .then((response) => response.json())
+                                  .then((poiData) => {
+                                    setDescription(poiData.message)
+                                  })
+                                  .catch((err) => {
+                                    console.log(err);
+                                  })
+                                  console.log( `${uri}/openai_rephrase?info=${JSON.stringify(poi)}`)
+                          
+                                
+                              }
+                              
+                              }>
                                 <View style={styles.card}>
                                   <Text style={styles.cardTitle}>{poi.name}</Text>
                                   <Text style={styles.cardText}>{poi.address}</Text>

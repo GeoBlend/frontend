@@ -1,5 +1,5 @@
-import {Ionicons} from "@expo/vector-icons";
-import {Camera, CameraType} from "expo-camera";
+import { Ionicons } from "@expo/vector-icons";
+import { Camera, CameraType } from "expo-camera";
 import {
   Animated,
   Button,
@@ -12,14 +12,19 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import React, {useEffect, useRef, useState} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as Location from "expo-location";
 
 import * as eva from "@eva-design/eva";
 import * as compsonents from "@ui-kitten/components";
-import {ApplicationProvider, Input, Layout, Text,} from "@ui-kitten/components";
+import {
+  ApplicationProvider,
+  Input,
+  Layout,
+  Text,
+} from "@ui-kitten/components";
 
-import MapView, {Marker} from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 
 const vh = Dimensions.get("window").height / 100;
 const vw = Dimensions.get("window").width / 100;
@@ -327,19 +332,35 @@ export default function App() {
 
                 {selectedPoi ? (
                   <View style={{ ...styles.constantSizeContainer, padding: 0 }}>
-                    <ScrollView>
+                    <ScrollView style={{ paddingHorizontal: 20 }}>
                       <compsonents.Button
-                        style={{ ...styles.closeButton, marginLeft: 40 }}
+                        style={{ alignSelf: "auto", marginBottom: 15 }}
                         onPress={() => setSelectedPoi(null)}
-                        status="success"
                       >
-                        SUCCESS
+                        BACK
                       </compsonents.Button>
 
                       <Text style={{ ...styles.cardTitle }}>
                         {selectedPoi.name}
                       </Text>
-                      <Text style={styles.cardText}>{description}</Text>
+                      {description != "Loading..." ? (
+                        <Text style={styles.cardText}>{description}</Text>
+                      ) : (
+                        <Layout
+                          style={{
+                            flexDirection: "row",
+                            flexWrap: "wrap",
+                            alignItems: "center",
+                            padding: 20,
+                          }}
+                        >
+                          <compsonents.Spinner
+                            style={{ alignSelf: "center"}}
+                            size="giant"
+                          />
+                          <Text style={{marginHorizontal:25} }>Generating Transcriptions</Text>
+                        </Layout>
+                      )}
                     </ScrollView>
                   </View>
                 ) : (

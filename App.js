@@ -1,5 +1,5 @@
-import { Ionicons } from "@expo/vector-icons";
-import { Camera, CameraType } from "expo-camera";
+import {Ionicons} from "@expo/vector-icons";
+import {Camera, CameraType} from "expo-camera";
 import {
   Animated,
   Button,
@@ -12,25 +12,19 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import * as Location from "expo-location";
 
 import * as eva from "@eva-design/eva";
-import {
-  ApplicationProvider,
-  Icon,
-  Input,
-  Layout,
-  Text,
-} from "@ui-kitten/components";
-
 import * as compsonents from "@ui-kitten/components";
+import {ApplicationProvider, Input, Layout, Text,} from "@ui-kitten/components";
 
-import MapView, { Marker } from "react-native-maps";
+import MapView, {Marker} from "react-native-maps";
+
+const vh = Dimensions.get("window").height / 100;
+const vw = Dimensions.get("window").width / 100;
 
 export default function App() {
-  const vh = Dimensions.get("window").height / 100;
-  const vw = Dimensions.get("window").width / 100;
   // console.log(vh, vw);
   const [type, setType] = useState(CameraType.back);
   const [permission, requestPermission] = Camera.useCameraPermissions();
@@ -534,10 +528,10 @@ const styles = StyleSheet.create({
 
   menuButton: {
     position: "absolute",
-    top: 55,
-    left: 15,
-    width: 75,
-    height: 75,
+    top: 7 * vh,
+    left: 2 * vw,
+    width: 20 * vw,
+    height: 20 * vw,
     borderRadius: 40,
     backgroundColor: "#1F4068",
     alignItems: "center",
@@ -548,10 +542,10 @@ const styles = StyleSheet.create({
   textBox: {
     flexDirection: "column", // <-- Add this line
     position: "absolute",
-    top: 55,
-    left: 105,
-    width: 295,
-    height: 75,
+    top: 7 * vh,
+    right: 2 * vw,
+    width: 70 * vw,
+    height: 20 * vw,
     borderRadius: 40,
     backgroundColor: "#1B1C25",
     alignItems: "center",

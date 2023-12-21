@@ -280,7 +280,7 @@ export default function App() {
                         {
                           allPois.map((poi, idx) => (
                               <TouchableOpacity key={idx} onPress={() => {
-                                poi.description = "Loading...";
+                                setDescription("Loading...");
                                 setSelectedPoi(poi)
                                 // setDescription("Loading...");
                                 fetch(
@@ -289,8 +289,8 @@ export default function App() {
                               )
                                   .then((response) => response.json())
                                   .then((poiData) => {
-                                    poi.description = poiData.message;
-                                    setSelectedPoi(poi)
+                                    setDescription(poiData.message);
+                                    // setSelectedPoi(poi)
                                   })
                                   .catch((err) => {
                                     console.log(err);

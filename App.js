@@ -25,7 +25,7 @@ export default function App() {
   // console.log(vh, vw);
   const [type, setType] = useState(CameraType.back);
   const [permission, requestPermission] = Camera.useCameraPermissions();
-  const [location, setLocation] = useState(JSON.parse('{"coords":{"accuracy":5,"altitude":0,"altitudeAccuracy":-1,"heading":-1,"latitude":40.7128,"longitude":-74.0060,"speed":-1},"timestamp":1619620000000}'));
+  const [location, setLocation] = useState(JSON.parse('{"coords":{"accuracy":5,"altitude":0,"altitudeAccuracy":-1,"heading":-1,"latitude":30.351810,"longitude":-81.672820,"speed":-1},"timestamp":1619620000000}'));
   const [pois, setPois] = useState([]);
   const [customPois, setCustomPois] = useState([]);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -67,10 +67,11 @@ export default function App() {
       )
           .then((response) => response.json())
           .then((poiData) => {
+            console.log(poiData);
             setPois(poiData);
           })
           .catch((err) => {
-            console.log(err);
+            console.log("error" + err);
           });
 
       fetch(
@@ -82,7 +83,7 @@ export default function App() {
             setCustomPois(customPoiData);
           })
           .catch((err) => {
-            console.log(err);
+            console.log("error" + err);
           });
     }
   }, [location]);
@@ -174,14 +175,14 @@ export default function App() {
 
     return earthRadiusMiles * c; // Distance in miles
   }
-
+  // console.log(pois)
   const allPois = pois.concat(customPois);
   allPois.forEach((poi) => {
     poi.dist = haversineDistanceInMiles({lat: location.coords.latitude, lon: location.coords.longitude}, poi)
   });
   allPois.sort((a, b) => a.dist - b.dist);
 
-  console.log({allPois});
+  // console.log(allPois);
 
   if (showmap) {
     return (
@@ -271,7 +272,7 @@ export default function App() {
                         <TouchableOpacity onPress={() => setSelectedPoi(null)} style={styles.closeButton}>
                           <Text style={styles.closeButtonText}>X</Text>
                         </TouchableOpacity>
-                        <Image source={{uri: "https://via.placeholder.com/150"}}/>
+                        <Image source={{uri: selectedPoi.imgUrl}} style={{ width: 200, height: 200 }}/>
                         <Text style={styles.cardTitle}>{selectedPoi.name}</Text>
                         <Text style={styles.cardText}>{description}</Text>
                       </View>
@@ -294,6 +295,7 @@ export default function App() {
                                   .catch((err) => {
                                     console.log(err);
                                   })
+                                  console.log( `${uri}/openai_rephrase?info=${JSON.stringify(poi)}`)
                               }
                               
                               }>

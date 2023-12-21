@@ -16,11 +16,11 @@ import {
 } from "react-native";
 import React, {useEffect, useRef, useState} from "react";
 import * as Location from "expo-location";
-import { Audio } from 'expo-av'
+import { Audio } from 'expo-av';
+import * as FileSystem from 'expo-file-system';
 
 import MapView, {Marker} from "react-native-maps";
 
-import { OpenAI } from "openai";
 
 export default function App() {
   const vh = Dimensions.get("window").height/100;
@@ -201,28 +201,38 @@ export default function App() {
   // console.log(allPois);
 
   const playSound = async (text) => {
-    console.log(text);
-    // const openai = new OpenAI({
-    //   apiKey: "YOUR KEY"
-    // });
-    // const audio = openai.audio.speech.create({
-    //   model: "tts-1",
-    //   voice: "echo",
-    //   response_format: 'mp3',
-    //   speed: 1.0,
-    //   input: text,
-    // });
-    // audio.stream_to_file('./assets/POINarration.mp3');
-    // console.log(audio)
-   
-    console.log('Loading Sound');
+    console.log("Playing")
     await Audio.setAudioModeAsync({
       playsInSilentModeIOS: true, 
       staysActiveInBackground: true,
     });
-    const { sound } = await Audio.Sound.createAsync( require('./assets/POINarration.mp3'));
-    setSound(sound);
-    await sound.playAsync();
+    
+    try {
+      const response = await fetch(`${uri}/openai_tts?text=${text}`);
+      const blob = await response.blob();
+
+      const fileInfo = await FileSystem.getInfoAsync("./assets/POINarration.mp3");
+      if (fileInfo.exists) {
+      
+        await FileSystem.deleteAsync("./assets/POINarration.mp3");
+      }
+
+      await FileSystem.writeAsStringAsync("./assets/POINarration.mp3", blob, { encoding: FileSystem.EncodingType.Base64 });
+    
+      console.log(blob);
+      
+      // const url = URL.createObjectURL(blob);
+      // console.log(url);
+    
+      // const { sound } = await Audio.Sound.createAsync({ uri: url });
+      const { sound } = await localSound.loadAsync({ uri: "./assets/POINarration.mp3" });
+      setSound(sound);
+      console.log(sound);
+      await sound.playAsync();
+      console.log("success");
+    } catch (err) {
+      console.error("Error:", err);
+    }
   }
 
   if (showmap) {

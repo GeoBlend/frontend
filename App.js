@@ -202,9 +202,9 @@ export default function App() {
 
   const playSound = async (text) => {
     console.log(text);
-    const openai = new OpenAI({
-      apiKey: "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"
-    });
+    // const openai = new OpenAI({
+    //   apiKey: "YOUR KEY"
+    // });
     // const audio = openai.audio.speech.create({
     //   model: "tts-1",
     //   voice: "echo",

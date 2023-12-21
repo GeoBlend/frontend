@@ -279,22 +279,21 @@ export default function App() {
                         {
                           allPois.map((poi, idx) => (
                               <TouchableOpacity key={idx} onPress={() => {
+                                poi.description = "Loading...";
                                 setSelectedPoi(poi)
-                                setDescription("Loading...");
+                                // setDescription("Loading...");
                                 fetch(
                                   `${uri}/openai_rephrase?info=${JSON.stringify(poi)}`,
                                   {method: "GET"}
                               )
                                   .then((response) => response.json())
                                   .then((poiData) => {
-                                    setDescription(poiData.message)
+                                    poi.description = poiData.message;
+                                    setSelectedPoi(poi)
                                   })
                                   .catch((err) => {
                                     console.log(err);
                                   })
-                                  console.log( `${uri}/openai_rephrase?info=${JSON.stringify(poi)}`)
-                          
-                                
                               }
                               
                               }>

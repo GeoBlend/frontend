@@ -8,8 +8,6 @@ import {
   Keyboard,
   ScrollView,
   StyleSheet,
-  Text,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
@@ -17,9 +15,18 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import * as Location from "expo-location";
 
-import MapView, { Marker } from "react-native-maps";
+import * as eva from "@eva-design/eva";
+import {
+  ApplicationProvider,
+  Icon,
+  Input,
+  Layout,
+  Text,
+} from "@ui-kitten/components";
 
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import * as compsonents from "@ui-kitten/components";
+
+import MapView, { Marker } from "react-native-maps";
 
 export default function App() {
   const vh = Dimensions.get("window").height / 100;
@@ -102,25 +109,33 @@ export default function App() {
 
   if (!permission) {
     // Camera permissions are still loading
-    return <View />;
+    return (
+      <ApplicationProvider {...eva} theme={eva.dark}>
+        <Layout />
+      </ApplicationProvider>
+    );
   }
 
   if (!permission.granted) {
     // Camera permissions are not granted yet
     return (
-      <View style={styles.containerCentered}>
-        <Text
-          style={{
-            textAlign: "center",
-            fontSize: 24,
-            fontWeight: "bold",
-            marginBottom: 8,
-          }}
-        >
-          We need your permission to show the camera
-        </Text>
-        <Button onPress={requestPermission} title="Grant Permission" />
-      </View>
+      <ApplicationProvider {...eva} theme={eva.dark}>
+        <Layout>
+          <View style={styles.containerCentered}>
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: 24,
+                fontWeight: "bold",
+                marginBottom: 8,
+              }}
+            >
+              We need your permission to show the camera
+            </Text>
+            <Button onPress={requestPermission} title="Grant Permission" />
+          </View>
+        </Layout>
+      </ApplicationProvider>
     );
   }
 
@@ -147,29 +162,52 @@ export default function App() {
   };
   if (!prefEntered) {
     return (
-      <SafeAreaProvider>
+      <ApplicationProvider {...eva} theme={eva.dark}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.containerCentered}>
-            <Text style={{ textAlign: "center", fontSize: 20 }}>
-              Enter what you are most interesting in seeing and learning about:
-            </Text>
-            <TextInput
-              style={styles.input}
+          <Layout style={{ ...styles.containerCentered }} level="4">
+            <Image  source={require("./assets/icon.png")} style={{width: 400, height: 400,alignSelf:"center",marginBottom:-110}}/>
+            <Layout
+              style={{ padding: 5, paddingBottom: 20, borderRadius: 10 }}
+              level="1"
+            >
+              <Text
+                style={{
+                  ...styles.text,
+                  textAlign: "center",
+                }}
+                category="h4"
+              >
+                Enter what you are most interesting in seeing and learning
+                about:
+              </Text>
+            </Layout>
+
+            <Input
               onChangeText={onChangeText}
               value={text}
               multiline={true}
-              numberOfLines={4}
-              placeholder="I LOVE gardens. I want to know more about this city's history."
+              numberOfLines={9}
+              placeholder="I LOVE gardens. I want to know more about this city's history. 
+              
+            "
               keyboardType="default"
+              style={{
+                margin: -10,
+                marginBottom: 20,
+                marginTop: 20,
+                borderWidth: 1,
+                borderRadius: 10,
+                padding: 10,
+                color: "#02030a",
+              }}
             />
-            <Button
-              onPress={setPref}
-              style={styles.textBoxText3}
-              title="Submit My Preferences"
-            />
-          </View>
+
+            <compsonents.Button status="primary" onPress={setPref}>
+              Submit My Preferences
+            </compsonents.Button>
+          </Layout>
         </TouchableWithoutFeedback>
-      </SafeAreaProvider>
+      </ApplicationProvider>
     );
   }
 
@@ -206,7 +244,7 @@ export default function App() {
 
   if (showmap) {
     return (
-      <SafeAreaProvider>
+      <ApplicationProvider {...eva} theme={eva.dark}>
         <View style={styles.container}>
           <MapView
             style={styles.map}
@@ -249,11 +287,11 @@ export default function App() {
             </Text>
           </View>
         </View>
-      </SafeAreaProvider>
+      </ApplicationProvider>
     );
   } else {
     return (
-      <SafeAreaProvider>
+      <ApplicationProvider {...eva} theme={eva.dark}>
         <View style={styles.container}>
           <TouchableOpacity
             style={styles.menuButton}
@@ -352,7 +390,7 @@ export default function App() {
             </Animated.View>
           </Camera>
         </View>
-      </SafeAreaProvider>
+      </ApplicationProvider>
     );
   }
 }
@@ -463,7 +501,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   text: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "bold",
     color: "#EBECF1",
     marginTop: 10,

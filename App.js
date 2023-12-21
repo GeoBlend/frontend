@@ -16,8 +16,11 @@ import {
 } from "react-native";
 import React, {useEffect, useRef, useState} from "react";
 import * as Location from "expo-location";
+import { Audio } from 'expo-av'
 
 import MapView, {Marker} from "react-native-maps";
+
+import { OpenAI } from "openai";
 
 export default function App() {
   const vh = Dimensions.get("window").height/100;
@@ -40,6 +43,9 @@ export default function App() {
 
   const [text, onChangeText] = React.useState("");
   const [uri, setURI] = React.useState("https://geoblendapi.deltaprojects.dev/api");
+
+  const [sound, setSound] = React.useState();
+
 
   useEffect(() => {
     (async () => {
@@ -87,6 +93,16 @@ export default function App() {
           });
     }
   }, [location]);
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          console.log('Unloading Sound');
+          sound.unloadAsync();
+        }
+      : undefined;
+    
+  }, [sound]);
 
   if (!permission) {
     // Camera permissions are still loading
@@ -184,6 +200,31 @@ export default function App() {
 
   // console.log(allPois);
 
+  const playSound = async (text) => {
+    console.log(text);
+    const openai = new OpenAI({
+      apiKey: "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"
+    });
+    // const audio = openai.audio.speech.create({
+    //   model: "tts-1",
+    //   voice: "echo",
+    //   response_format: 'mp3',
+    //   speed: 1.0,
+    //   input: text,
+    // });
+    // audio.stream_to_file('./assets/POINarration.mp3');
+    // console.log(audio)
+   
+    console.log('Loading Sound');
+    await Audio.setAudioModeAsync({
+      playsInSilentModeIOS: true, 
+      staysActiveInBackground: true,
+    });
+    const { sound } = await Audio.Sound.createAsync( require('./assets/POINarration.mp3'));
+    setSound(sound);
+    await sound.playAsync();
+  }
+
   if (showmap) {
     return (
       <View style={styles.container}>
@@ -272,7 +313,10 @@ export default function App() {
                         <TouchableOpacity onPress={() => setSelectedPoi(null)} style={styles.closeButton}>
                           <Text style={styles.closeButtonText}>X</Text>
                         </TouchableOpacity>
-                        <Image source={{uri: selectedPoi.imgUrl}} style={{ width: 200, height: 200 }}/>
+                        <TouchableOpacity onPress={() => playSound(description)}>
+                          <Text style={styles.closeButtonText}>Play</Text>
+                        </TouchableOpacity>
+                        {/* <Image source={{uri: selectedPoi.imgUrl}} style={{ width: 200, height: 200 }}/> */}
                         <Text style={styles.cardTitle}>{selectedPoi.name}</Text>
                         <Text style={styles.cardText}>{description}</Text>
                       </View>

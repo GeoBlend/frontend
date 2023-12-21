@@ -18,6 +18,9 @@
       "supportsTablet": true,
       "config": {
         "googleMapsApiKey": "AIzaSyA2Qy5zBT5qFh_ZemCQrwUw_-Ms7xGk108"
+      },
+      "infoPlist": {
+        "UIBackgroundModes": ["audio"]
       }
     },
     "android": {

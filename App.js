@@ -38,7 +38,7 @@ export default function App() {
   const [description, setDescription] = useState("");
   const animatedValue = useRef(new Animated.Value(0)).current;
 
-  const [text, onChangeText] = React.useState("");
+  const [prefText, setPrefText] = React.useState("");
   const [uri, setURI] = React.useState("https://geoblendapi.deltaprojects.dev/api");
 
   useEffect(() => {
@@ -142,8 +142,8 @@ export default function App() {
         </Text>
         <TextInput
           style={styles.input}
-          onChangeText={onChangeText}
-          value={text}
+          onChangeText={pref => setPrefText(pref)}
+          value={prefText}
           multiline = {true}
           numberOfLines = {4}
           placeholder="I LOVE gardens. I want to know more about this city's history."
@@ -283,8 +283,9 @@ export default function App() {
                                 setDescription("Loading...");
                                 setSelectedPoi(poi)
                                 // setDescription("Loading...");
+                                console.log(prefText);
                                 fetch(
-                                  `${uri}/openai_rephrase?info=${JSON.stringify(poi)}`,
+                                  `${uri}/openai_rephrase?info=${JSON.stringify(poi)}&pref=${prefText}`,
                                   {method: "GET"}
                               )
                                   .then((response) => response.json())

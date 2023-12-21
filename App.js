@@ -1,5 +1,5 @@
-import {Ionicons} from "@expo/vector-icons";
-import {Camera, CameraType} from "expo-camera";
+import { Ionicons } from "@expo/vector-icons";
+import { Camera, CameraType } from "expo-camera";
 import {
   Animated,
   Button,
@@ -14,18 +14,24 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import React, {useEffect, useRef, useState} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as Location from "expo-location";
 
-import MapView, {Marker} from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
+
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function App() {
-  const vh = Dimensions.get("window").height/100;
-  const vw = Dimensions.get("window").width/100;
+  const vh = Dimensions.get("window").height / 100;
+  const vw = Dimensions.get("window").width / 100;
   // console.log(vh, vw);
   const [type, setType] = useState(CameraType.back);
   const [permission, requestPermission] = Camera.useCameraPermissions();
-  const [location, setLocation] = useState(JSON.parse('{"coords":{"accuracy":5,"altitude":0,"altitudeAccuracy":-1,"heading":-1,"latitude":30.351810,"longitude":-81.672820,"speed":-1},"timestamp":1619620000000}'));
+  const [location, setLocation] = useState(
+    JSON.parse(
+      '{"coords":{"accuracy":5,"altitude":0,"altitudeAccuracy":-1,"heading":-1,"latitude":30.351810,"longitude":-81.672820,"speed":-1},"timestamp":1619620000000}'
+    )
+  );
   const [pois, setPois] = useState([]);
   const [customPois, setCustomPois] = useState([]);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -39,18 +45,22 @@ export default function App() {
   const animatedValue = useRef(new Animated.Value(0)).current;
 
   const [text, onChangeText] = React.useState("");
-  const [uri, setURI] = React.useState("https://geoblendapi.deltaprojects.dev/api");
+  const [uri, setURI] = React.useState(
+    "https://geoblendapi.deltaprojects.dev/api"
+  );
 
   useEffect(() => {
     (async () => {
-           
       console.log("Getting location");
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         setErrorMsg("Permission to access location was denied");
         return;
       }
-      let loc = await Location.getCurrentPositionAsync({accuracy: Location.Accuracy.Highest, maximumAge: 100000});
+      let loc = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Highest,
+        maximumAge: 100000,
+      });
       if (loc.coords.latitude) {
         setLocation(loc);
       }
@@ -60,31 +70,33 @@ export default function App() {
 
   useEffect(() => {
     if (location) {
-      console.log(`${uri}/get_pois?lat=${location.coords.latitude}&lon=${location.coords.longitude}`);
+      console.log(
+        `${uri}/get_pois?lat=${location.coords.latitude}&lon=${location.coords.longitude}`
+      );
       fetch(
-          `${uri}/get_pois?lat=${location.coords.latitude}&lon=${location.coords.longitude}`,
-          {method: "GET"}
+        `${uri}/get_pois?lat=${location.coords.latitude}&lon=${location.coords.longitude}`,
+        { method: "GET" }
       )
-          .then((response) => response.json())
-          .then((poiData) => {
-            console.log(poiData);
-            setPois(poiData);
-          })
-          .catch((err) => {
-            console.log("error" + err);
-          });
+        .then((response) => response.json())
+        .then((poiData) => {
+          console.log(poiData);
+          setPois(poiData);
+        })
+        .catch((err) => {
+          console.log("error" + err);
+        });
 
       fetch(
-          `${uri}/get_custom_pois?lat=${location.coords.latitude}&lon=${location.coords.longitude}`,
-          {method: "GET"}
+        `${uri}/get_custom_pois?lat=${location.coords.latitude}&lon=${location.coords.longitude}`,
+        { method: "GET" }
       )
-          .then((response) => response.json())
-          .then((customPoiData) => {
-            setCustomPois(customPoiData);
-          })
-          .catch((err) => {
-            console.log("error" + err);
-          });
+        .then((response) => response.json())
+        .then((customPoiData) => {
+          setCustomPois(customPoiData);
+        })
+        .catch((err) => {
+          console.log("error" + err);
+        });
     }
   }, [location]);
 
@@ -130,37 +142,39 @@ export default function App() {
   const animatedStyle = {
     marginTop: animatedValue.interpolate({
       inputRange: [0, 1],
-      outputRange: [vh*25, vh*85],
+      outputRange: [vh * 25, vh * 85],
     }),
   };
   if (!prefEntered) {
     return (
+      <SafeAreaProvider>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.containerCentered} >
-        <Text style={{textAlign:"center", fontSize:20}}>
-          Enter what you are most interesting in seeing and learning about:
-        </Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={onChangeText}
-          value={text}
-          multiline = {true}
-          numberOfLines = {4}
-          placeholder="I LOVE gardens. I want to know more about this city's history."
-          keyboardType="default"
-        />
-        <Button
-          onPress={setPref}
-          style={styles.textBoxText3}
-          title="Submit My Preferences"
-        />
-      </View>
+          <View style={styles.containerCentered}>
+            <Text style={{ textAlign: "center", fontSize: 20 }}>
+              Enter what you are most interesting in seeing and learning about:
+            </Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={onChangeText}
+              value={text}
+              multiline={true}
+              numberOfLines={4}
+              placeholder="I LOVE gardens. I want to know more about this city's history."
+              keyboardType="default"
+            />
+            <Button
+              onPress={setPref}
+              style={styles.textBoxText3}
+              title="Submit My Preferences"
+            />
+          </View>
         </TouchableWithoutFeedback>
+      </SafeAreaProvider>
     );
   }
 
   function haversineDistanceInMiles(coords1, coords2) {
-    const toRadians = angle => angle * Math.PI / 180;
+    const toRadians = (angle) => (angle * Math.PI) / 180;
 
     const earthRadiusMiles = 3958.8; // Earth's radius in miles
     const lat1 = toRadians(coords1.lat);
@@ -168,9 +182,12 @@ export default function App() {
     const deltaLat = toRadians(coords2.lat - coords1.lat);
     const deltaLon = toRadians(coords2.lon - coords1.lon);
 
-    const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
-        Math.cos(lat1) * Math.cos(lat2) *
-        Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
+    const a =
+      Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+      Math.cos(lat1) *
+        Math.cos(lat2) *
+        Math.sin(deltaLon / 2) *
+        Math.sin(deltaLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     return earthRadiusMiles * c; // Distance in miles
@@ -178,7 +195,10 @@ export default function App() {
   // console.log(pois)
   const allPois = pois.concat(customPois);
   allPois.forEach((poi) => {
-    poi.dist = haversineDistanceInMiles({lat: location.coords.latitude, lon: location.coords.longitude}, poi)
+    poi.dist = haversineDistanceInMiles(
+      { lat: location.coords.latitude, lon: location.coords.longitude },
+      poi
+    );
   });
   allPois.sort((a, b) => a.dist - b.dist);
 
@@ -186,136 +206,153 @@ export default function App() {
 
   if (showmap) {
     return (
-      <View style={styles.container}>
-        <MapView
-          style={styles.map}
-          region={{
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-            latitudeDelta: 0.00922,
-            longitudeDelta: 0.00421,
-          }}
-          showsUserLocation={true}
-          showsMyLocationButton={true}
-          showsCompass={true}
-          mapType={"satellite"}
-        >
-          {allPois.map((poi, idx) => (
-                  <Marker
-                      coordinate={{latitude: poi.lat, longitude: poi.lon}}
-                      title={poi.name}
-                      description={`${Math.round(poi.dist * 100) / 100} mile(s) away`}
-                      key={idx}
-                  />
-              )
-          )}
-        </MapView>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => {
-            setMap(!showmap);
-          }}
-        >
-          <Ionicons name="ios-menu" size={44} color="#EBECF1" />
-        </TouchableOpacity>
+      <SafeAreaProvider>
+        <View style={styles.container}>
+          <MapView
+            style={styles.map}
+            region={{
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+              latitudeDelta: 0.00922,
+              longitudeDelta: 0.00421,
+            }}
+            showsUserLocation={true}
+            showsMyLocationButton={true}
+            showsCompass={true}
+            mapType={"satellite"}
+          >
+            {allPois.map((poi, idx) => (
+              <Marker
+                coordinate={{ latitude: poi.lat, longitude: poi.lon }}
+                title={poi.name}
+                description={`${Math.round(poi.dist * 100) / 100} mile(s) away`}
+                key={idx}
+              />
+            ))}
+          </MapView>
+          <TouchableOpacity
+            style={styles.menuButton}
+            onPress={() => {
+              setMap(!showmap);
+            }}
+          >
+            <Ionicons name="ios-menu" size={44} color="#EBECF1" />
+          </TouchableOpacity>
 
-        <View style={styles.textBox}>
-          <Text style={styles.textBoxText}>Location:</Text>
-          <Text style={styles.textBoxText}>
-            Latitude: {location.coords.latitude.toFixed(5)}
-          </Text>
-          <Text style={styles.textBoxText}>
-            Longitude {location.coords.longitude.toFixed(5)}
-          </Text>
+          <View style={styles.textBox}>
+            <Text style={styles.textBoxText}>Location:</Text>
+            <Text style={styles.textBoxText}>
+              Latitude: {location.coords.latitude.toFixed(5)}
+            </Text>
+            <Text style={styles.textBoxText}>
+              Longitude {location.coords.longitude.toFixed(5)}
+            </Text>
+          </View>
         </View>
-      </View>
+      </SafeAreaProvider>
     );
-  }
-  else {
-    return ( 
-      <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => {
-            setMap(!showmap);
-          }}
-        >
-          <Ionicons name="ios-menu" size={44} color="#EBECF1" />
-        </TouchableOpacity> 
-        {/* put in that sliding stuff ehre */}
+  } else {
+    return (
+      <SafeAreaProvider>
+        <View style={styles.container}>
+          <TouchableOpacity
+            style={styles.menuButton}
+            onPress={() => {
+              setMap(!showmap);
+            }}
+          >
+            <Ionicons name="ios-menu" size={44} color="#EBECF1" />
+          </TouchableOpacity>
+          {/* put in that sliding stuff ehre */}
 
-        <View style={styles.textBox}>
-          <Text style={styles.textBoxText}>Location:</Text>
-          <Text style={styles.textBoxText}>
-            Latitude: {location.coords.latitude.toFixed(5)}
-          </Text>
-          <Text style={styles.textBoxText}>
-            Longitude {location.coords.longitude.toFixed(5)}
-          </Text>
-        </View>
+          <View style={styles.textBox}>
+            <Text style={styles.textBoxText}>Location:</Text>
+            <Text style={styles.textBoxText}>
+              Latitude: {location.coords.latitude.toFixed(5)}
+            </Text>
+            <Text style={styles.textBoxText}>
+              Longitude {location.coords.longitude.toFixed(5)}
+            </Text>
+          </View>
 
-        <Camera style={styles.details} type={type}>
-          <Animated.View style={[styles.textArea, animatedStyle]}>
-            <View style={styles.container2}>
-              <TouchableOpacity
-                style={styles.detailsToggle}
-                onPress={toggleDetails}
-              >
-                <View style={styles.box}></View>
-              </TouchableOpacity>
-              <View style={styles.constantSizeContainer}>
-                {
-                  selectedPoi
-                      ? 
-                      <View >
-                        
-                        <TouchableOpacity onPress={() => setSelectedPoi(null)} style={styles.closeButton}>
-                          <Text style={styles.closeButtonText}>X</Text>
+          <Camera style={styles.details} type={type}>
+            <Animated.View style={[styles.textArea, animatedStyle]}>
+              <View style={styles.container2}>
+                <TouchableOpacity
+                  style={styles.detailsToggle}
+                  onPress={toggleDetails}
+                >
+                  <View style={styles.box}></View>
+                </TouchableOpacity>
+                <View style={styles.constantSizeContainer}>
+                  {selectedPoi ? (
+                    <View>
+                      <TouchableOpacity
+                        onPress={() => setSelectedPoi(null)}
+                        style={styles.closeButton}
+                      >
+                        <Text style={styles.closeButtonText}>X</Text>
+                      </TouchableOpacity>
+                      <Image
+                        source={{ uri: selectedPoi.imgUrl }}
+                        style={{ width: 200, height: 200 }}
+                      />
+                      <Text style={styles.cardTitle}>{selectedPoi.name}</Text>
+                      <Text style={styles.cardText}>{description}</Text>
+                    </View>
+                  ) : (
+                    <ScrollView style={styles.container2}>
+                      {allPois.map((poi, idx) => (
+                        <TouchableOpacity
+                          key={idx}
+                          onPress={() => {
+                            setDescription("Loading...");
+                            setSelectedPoi(poi);
+                            // setDescription("Loading...");
+                            fetch(
+                              `${uri}/openai_rephrase?info=${JSON.stringify(
+                                poi
+                              )}`,
+                              { method: "GET" }
+                            )
+                              .then((response) => response.json())
+                              .then((poiData) => {
+                                setDescription(poiData.message);
+                                // setSelectedPoi(poi);
+                              })
+                              .catch((err) => {
+                                console.log(err);
+                              });
+                            console.log(
+                              `${uri}/openai_rephrase?info=${JSON.stringify(
+                                poi
+                              )}`
+                            );
+                          }}
+                        >
+                          <View style={styles.card}>
+                            <Text style={styles.cardTitle}>{poi.name}</Text>
+                            <Text style={styles.cardText}>{poi.address}</Text>
+                            <Text style={styles.cardText}>
+                              Latitude: {poi.lat}
+                            </Text>
+                            <Text style={styles.cardText}>
+                              Longitude: {poi.lon}
+                            </Text>
+                            <Text style={styles.cardText}>
+                              {Math.round(poi.dist * 100) / 100} mile(s) away
+                            </Text>
+                          </View>
                         </TouchableOpacity>
-                        <Image source={{uri: selectedPoi.imgUrl}} style={{ width: 200, height: 200 }}/>
-                        <Text style={styles.cardTitle}>{selectedPoi.name}</Text>
-                        <Text style={styles.cardText}>{description}</Text>
-                      </View>
-                      : <ScrollView style={styles.container2}>
-                        {
-                          allPois.map((poi, idx) => (
-                              <TouchableOpacity key={idx} onPress={() => {
-                                setDescription("Loading...");
-                                setSelectedPoi(poi)
-                                // setDescription("Loading...");
-                                fetch(
-                                  `${uri}/openai_rephrase?info=${JSON.stringify(poi)}`,
-                                  {method: "GET"}
-                              )
-                                  .then((response) => response.json())
-                                  .then((poiData) => {
-                                    setDescription(poiData.message);
-                                    // setSelectedPoi(poi)
-                                  })
-                                  .catch((err) => {
-                                    console.log(err);
-                                  })
-                                  console.log( `${uri}/openai_rephrase?info=${JSON.stringify(poi)}`)
-                              }
-                              
-                              }>
-                                <View style={styles.card}>
-                                  <Text style={styles.cardTitle}>{poi.name}</Text>
-                                  <Text style={styles.cardText}>{poi.address}</Text>
-                                  <Text style={styles.cardText}>Latitude: {poi.lat}</Text>
-                                  <Text style={styles.cardText}>Longitude: {poi.lon}</Text>
-                                  <Text style={styles.cardText}>{Math.round(poi.dist * 100) / 100} mile(s) away</Text>
-                                </View>
-                              </TouchableOpacity>
-                          ))
-                        }
-                      </ScrollView>
-                }
+                      ))}
+                    </ScrollView>
+                  )}
+                </View>
               </View>
-            </View>
-          </Animated.View>
-        </Camera>
-      </View>
+            </Animated.View>
+          </Camera>
+        </View>
+      </SafeAreaProvider>
     );
   }
 }
@@ -369,12 +406,12 @@ const styles = StyleSheet.create({
     // position: "absolute",
   },
   containerCentered: {
-    display:"grid", 
-    justifyContent:"center", 
-    textAllign:"center", 
-    padding:20, 
-    width:"100%", 
-    height:"100%"
+    display: "grid",
+    justifyContent: "center",
+    textAllign: "center",
+    padding: 20,
+    width: "100%",
+    height: "100%",
   },
   container2: {
     flex: 1,
@@ -494,22 +531,22 @@ const styles = StyleSheet.create({
   closeButton: {
     top: 10,
     right: 10,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 20,
     width: 40,
     height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
-    elevation: 3
+    elevation: 3,
   },
 
   closeButtonText: {
-    color: 'black',
+    color: "black",
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });

@@ -324,20 +324,26 @@ export default function App() {
                 </TouchableOpacity>
                 <View style={styles.constantSizeContainer}>
                   {selectedPoi ? (
-                    <View>
-                      <TouchableOpacity
-                        onPress={() => setSelectedPoi(null)}
-                        style={styles.closeButton}
-                      >
-                        <Text style={styles.closeButtonText}>X</Text>
-                      </TouchableOpacity>
-                      <Image
-                        source={{ uri: selectedPoi.imgUrl }}
-                        style={{ width: 200, height: 200 }}
-                      />
-                      <Text style={styles.cardTitle}>{selectedPoi.name}</Text>
-                      <Text style={styles.cardText}>{description}</Text>
-                    </View>
+
+                    <Layout style={{...styles.container,margin:10,backgroundColor:"#02030a"}}
+                    level="2"> 
+                      </Layout>
+                    
+                    // <Layout style={{...styles.container,margin:10,backgroundColor:"#02030a"}}>
+                    //   <TouchableOpacity
+                    //     onPress={() => setSelectedPoi(null)}
+                    //     style={styles.closeButton}
+                    //   >
+                    //     <Text style={styles.closeButtonText}>X</Text>
+                    //   </TouchableOpacity>
+                    //   <Image
+                    //     source={{ uri: selectedPoi.imgUrl }}
+                    //     style={{ width: 200, height: 200 }}
+                    //   />
+                    //   <Text style={styles.cardTitle}>{selectedPoi.name}</Text>
+                    //   <Text style={styles.cardText}>{description}</Text>
+                    // </Layout>
+
                   ) : (
                     <ScrollView style={styles.container2}>
                       {allPois.map((poi, idx) => (

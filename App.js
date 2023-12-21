@@ -165,7 +165,15 @@ export default function App() {
       <ApplicationProvider {...eva} theme={eva.dark}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <Layout style={{ ...styles.containerCentered }} level="4">
-            <Image  source={require("./assets/icon.png")} style={{width: 400, height: 400,alignSelf:"center",marginBottom:-110}}/>
+            <Image
+              source={require("./assets/icon.png")}
+              style={{
+                width: 400,
+                height: 400,
+                alignSelf: "center",
+                marginBottom: -110,
+              }}
+            />
             <Layout
               style={{ padding: 5, paddingBottom: 20, borderRadius: 10 }}
               level="1"
@@ -322,29 +330,41 @@ export default function App() {
                 >
                   <View style={styles.box}></View>
                 </TouchableOpacity>
-                <View style={styles.constantSizeContainer}>
-                  {selectedPoi ? (
 
-                    <Layout style={{...styles.container,margin:10,backgroundColor:"#02030a"}}
-                    level="2"> 
-                      </Layout>
-                    
-                    // <Layout style={{...styles.container,margin:10,backgroundColor:"#02030a"}}>
-                    //   <TouchableOpacity
-                    //     onPress={() => setSelectedPoi(null)}
-                    //     style={styles.closeButton}
-                    //   >
-                    //     <Text style={styles.closeButtonText}>X</Text>
-                    //   </TouchableOpacity>
-                    //   <Image
-                    //     source={{ uri: selectedPoi.imgUrl }}
-                    //     style={{ width: 200, height: 200 }}
-                    //   />
-                    //   <Text style={styles.cardTitle}>{selectedPoi.name}</Text>
-                    //   <Text style={styles.cardText}>{description}</Text>
-                    // </Layout>
+                {selectedPoi ? (
+                  <View style={{ ...styles.constantSizeContainer, padding: 0 }}>
+                    <ScrollView>
+                      <compsonents.Button
+                        style={{ ...styles.closeButton, marginLeft: 40 }}
+                        onPress={() => setSelectedPoi(null)}
+                        status="success"
+                      >
+                        SUCCESS
+                      </compsonents.Button>
 
-                  ) : (
+                      <Text style={{ ...styles.cardTitle }}>
+                        {selectedPoi.name}
+                      </Text>
+                      <Text style={styles.cardText}>{description}</Text>
+                    </ScrollView>
+                  </View>
+                ) : (
+                  // <View style={styles.card}>
+
+                  //   <Image
+                  //     source={{ uri: selectedPoi.imgUrl }}
+                  //     style={{ width: 200, height: 200 }}
+                  //   />
+                  //   </TouchableOpacity>
+                  //   <Image
+                  //     source={{ uri: selectedPoi.imgUrl }}
+                  //     style={{ width: 200, height: 200 }}
+                  //   />
+                  //   <Text style={styles.cardTitle}>{selectedPoi.name}</Text>
+                  //   <Text style={styles.cardText}>{description}</Text>
+                  // </Layout>
+
+                  <View style={{ ...styles.constantSizeContainer, padding: 0 }}>
                     <ScrollView style={styles.container2}>
                       {allPois.map((poi, idx) => (
                         <TouchableOpacity
@@ -390,8 +410,8 @@ export default function App() {
                         </TouchableOpacity>
                       ))}
                     </ScrollView>
-                  )}
-                </View>
+                  </View>
+                )}
               </View>
             </Animated.View>
           </Camera>
@@ -478,11 +498,10 @@ const styles = StyleSheet.create({
   constantSizeContainer: {
     // position: "absolute",
     marginTop: 40,
-    marginRight: 0,
     height: "100%", // Set your desired height
-    justifyContent: "center",
-    alignItems: "center",
     alignSelf: "center",
+    width: "100%",
+    alignContent: "center",
   },
   details: {
     flex: 1,
